@@ -15,8 +15,17 @@ print(data[0:5])
 
 # print("Size: " + data.shape)
 
+# 10
+from sklearn import preprocessing
 
+arreglo = preprocessing.LabelEncoder()
+df = df.apply(arreglo.fit_transform)
 
+scaler = preprocessing.MinMaxScaler()
+scaler.fit(df)
+
+df = pd.DataFrame(scaler.transform(df), index=df.index, columns=df.columns)
+df.iloc[4:10]
 
 
 
