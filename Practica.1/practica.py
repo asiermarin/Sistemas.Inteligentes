@@ -13,6 +13,8 @@ print(data[0:5])
 # Obtengo las 5 primeras lineas
 print(data[0:5])
 
+# 5
+
 # print("Size: " + data.shape)
 
 # 10
