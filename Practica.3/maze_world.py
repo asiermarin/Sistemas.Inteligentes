@@ -1,4 +1,4 @@
-xºimport copy
+import copy
 import math
 
 

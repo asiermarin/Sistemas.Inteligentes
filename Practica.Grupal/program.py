@@ -1,5 +1,6 @@
 from collections import deque
-import math 
+import math
+import numpy as np
 
 mat = [
     [-1, -9, 0, -1, 0],
@@ -7,10 +8,12 @@ mat = [
     [2, 0, 0, -6, 0],
     [0, -7, -3, 5, -4]
 ]
+rows = len(mat)
+columns = len(mat[0])
 
-
-print(mat)
-print(mat[0][0])
+print(rows)
+print(columns)
+print(np.matrix(mat))
 
 class Point:
     
@@ -35,80 +38,59 @@ EAST = Point(1, 0)
 WEST = Point(-1, 0)
 
 class Aplicar_teorema:
-    
-    _mat = None
-    NEGATIVO = -1
 
-    def __init__(self, mat_size_x, mat_size_y, mat):
-        self.mat_size_x = mat_size_x
-        self.mat_size_y = mat_size_y
-        _mat = mat
+    def __init__(self, anchura_matriz, altura_matriz, mat):
+        self.anchura_matriz = anchura_matriz
+        self.altura_matriz = altura_matriz
+        self._mat = mat
+        self.ejercutar_busqueda_dfs()
 
-    def ejecutar_bfs(self):
+    def ejercutar_busqueda_dfs(self):
         pasos = 0
-        q1 = deque()
-        q1.append(positivo1)
-        q1.append(positivo2)
-        q1.append(positivo3)
+        cola_puntos = deque()
+        cola_puntos.append(positivo1)
+        cola_puntos.append(positivo2)
+        cola_puntos.append(positivo3)
 
-        q2 = deque()
-        while q1:
-            posicion_actual = None
+        cola_puntos_intento = deque()
+        while cola_puntos:
             pasos = pasos + 1
-            q2 = q1.copy()
-            q1.clear()
-            for punto in q2:    
-                puntos_alrededores = self.obtener_alrededores_negativos(punto)
-                for punto_alrededor in puntos_alrededores:
-                    if (not self.es_positivo(punto, q2)):
-                        # punto = q2.popleft()
-                        punto_positivo = punto * (NEGATIVO)
-                        q1.append(punto_positivo)
+            cola_puntos_intento = cola_puntos.copy()
+            cola_puntos.clear()
+            puntos_alrededores_positivos = []
+            for punto in cola_puntos_intento:    
+                puntos_alrededores_positivos = self.devolver_puntos_alrededores_positivos(punto)
+            for punto_alrededor in puntos_alrededores_positivos:
+                cola_puntos_intento.append(punto_alrededor)
+            cola_puntos.copy(cola_puntos_intento)
             pasos = pasos + 1
             print(pasos)
+            print(np.matrix(self._mat))
             return pasos
-    
-    def es_positivo(self, punto, q2):
-        for posicion_visitada in q2:
-            if ((punto.x == posicion_visitada.x) and (punto.y == posicion_visitada.y) and (self._mat[punto.x, punto.y] > 0)):
-                return True
-        return False
 
-    def obtener_alrededores_negativos(self, current_point):
-            neighbors = []
-            potential_neighbors = [[NORTH.x, NORTH.y], [SOUTH.x, SOUTH.y], [EAST.x, EAST.y], [WEST.x, WEST.y]]
-            for neighbor in potential_neighbors:
-                target_point = Point(current_point.x + neighbor[0], current_point.y + neighbor[1])
-                if 0 <= target_point.x < self.mat_size_x and 0 <= target_point.y < self.mat_size_y:
-                    if self.get_current_point_value(target_point) != 0:
-                        neighbors.append(target_point)
-            return neighbors
 
-    def get_current_point_value(self, current_point):
+    def devolver_puntos_alrededores_positivos(self, punto_actual):
+        posiciones_alrededores = []
+        posibles_alrededores = [[NORTH.x, NORTH.y], [SOUTH.x, SOUTH.y], [EAST.x, EAST.y], [WEST.x, WEST.y]]
+        for punto_alrededor in posibles_alrededores:
+            punto_cardinal = Point(punto_actual.x + punto_alrededor[0], punto_actual.y + punto_alrededor[1])
+            if (0 <= punto_cardinal.x < self.anchura_matriz and 0 <= punto_cardinal.y < self.altura_matriz):
+                if (self.obtener_posicion_matriz(punto_cardinal) < 0):
+                    self.sustituir_valor_matriz(punto_cardinal)
+                    posiciones_alrededores.append(punto_cardinal)
+        return posiciones_alrededores
+
+
+    def obtener_posicion_matriz(self, current_point):
         return self._mat[current_point.x][current_point.y]
+    
+    def sustituir_valor_matriz(self, punto_cardinal):
+            self._mat[punto_cardinal.x][punto_cardinal.y] = abs(self._mat[punto_cardinal.x][punto_cardinal.y])
 
-    def overlay_points_on_map(self, points):
-        overlay_map = copy.deepcopy(self.maze)
-        for point in points:
-            # new_row = overlay_map[point.x][:point.y] + '@' + overlay_map[point.x][point.y + 1:]
-            new_row = 1
-            overlay_map[point.x] = new_row
-
-    def get_path(point):
-        path = []
-        current_point = point
-        while current_point.parent is not None:
-            path.append(current_point)
-            current_point = current_point.parent
-        return path
+print(mat[4][3])
 
 positivo1 = Point(0, 2)
 positivo2 = Point(1, 3)
 positivo3 = Point(3, 3)
 
-comenzar_teorema = Aplicar_teorema(5, 4, mat)
-ejecutar = comenzar_teorema.ejecutar_bfs()
-path = comenzar_teorema.get_path(ejecutar)
-mostrar_matriz = comenzar_teorema.overlay_points_on_map(path)
-
-print(mat)
+aplicar_dfs = Aplicar_teorema(5, 4, mat)
