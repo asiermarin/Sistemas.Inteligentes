@@ -3,8 +3,10 @@ import textdistance
 from time import sleep
 
 TAMANIO_CADENA = 13
+POBALCION = 100
 GENES_POSIBLES = ' abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ1234567890,.-;:_¿?¡!'
 CADENA_OBJETIVO = "Industria 4.0"
+PORCENTAJE_POBLACION_HIJOS = 0.9
 PORCENTAJE_APTOS_NECESARIA_INICIAL = 0.5
 PORCENTAJE_MAS_APTOS = 0.2
 
@@ -36,41 +38,59 @@ class Cromosoma:
 def generar_lista_poblacion():
     print("Generando lista")
     poblacion = []
-    for i in range(100):
+    for i in range(POBALCION):
         cadena = ''.join(random.choice(GENES_POSIBLES) for i in range(TAMANIO_CADENA))
         new_cromosoma = Cromosoma(cadena, TAMANIO_CADENA)
         poblacion.append(new_cromosoma)
     return poblacion
 
-def devolver_numero_aptos_segun_porcentaje(lista, porcentaje):
+def devolver_numero_necesario_segun_porcentaje(lista, porcentaje):
     numero_poblacion = len(lista)
     nuemro_necesario = int(numero_poblacion * porcentaje)
     return nuemro_necesario
 
 # Devolvemos los 50 mejores
-def devolver_cromosomas_aptos(lista_poblacion, porcetaje_aptos_necesaria):
+def devolver_cromosomas_aptos(lista_poblacion):
     print("Devolviendo cromosomas aptos")
     lista_poblacion.sort(key=lambda x: x.aptitud, reverse=True)
-    numero_lista_aptos_necesaria = devolver_numero_aptos_segun_porcentaje(lista_poblacion, porcetaje_aptos_necesaria)
+    numero_lista_aptos_necesaria = devolver_numero_necesario_segun_porcentaje(lista_poblacion, PORCENTAJE_APTOS_NECESARIA_INICIAL) # 50
     lista_aptos = lista_poblacion[:numero_lista_aptos_necesaria]
     return lista_aptos
 
-def generar_proxima_generacion(lista_cromosomas_aptos, porcentaje_mas_aptos):
+def generar_proxima_generacion(lista_cromosomas_aptos, lista_poblacion):
     print("Generando proxima generacion")
-    numero_lista_aptos_necesaria = devolver_numero_aptos_segun_porcentaje(lista_cromosomas_aptos, porcentaje_mas_aptos)
-    lista_proxima_generacion = lista_cromosomas_aptos[:numero_lista_aptos_necesaria] # ya tenemos el 10%
+    rango_mas_aptos = devolver_numero_necesario_segun_porcentaje(lista_cromosomas_aptos, PORCENTAJE_MAS_APTOS) # 10
+    rango_lista_hijos = devolver_numero_necesario_segun_porcentaje(lista_poblacion, PORCENTAJE_POBLACION_HIJOS) # 90
+    lista_proxima_generacion = lista_cromosomas_aptos[:rango_mas_aptos] # ya tenemos el 10%
+    lista_hijos = reproducir_hijos(lista_cromosomas_aptos, rango_lista_hijos) # Otro 90%
+    lista_proxima_generacion.extend(lista_hijos)
+    lista_proxima_generacion.sort(key=lambda x: x.aptitud, reverse=True)
+    return lista_proxima_generacion
+
+def reproducir_hijos(lista_cromosomas_aptos, rango_lista_hijos):
+    lista_hijos = []
+    for i in range(rango_lista_hijos):
+        cromosoma_padre_1 = lista_cromosomas_aptos[random.randrange(len(lista_cromosomas_aptos))]
+        cromosoma_padre_2 = lista_cromosomas_aptos[random.randrange(len(lista_cromosomas_aptos))]
+        lista_hijos.append(mutacion(cromosoma_padre_1, cromosoma_padre_2))
+    return lista_hijos
+
+def mutacion(cromosoma_padre_1, cromosoma_padre_2):
+    genes_padres = cromosoma_padre_1.genes + cromosoma_padre_2.genes
+    genes_mutados = ''.join(random.choice(genes_padres) for i in range(TAMANIO_CADENA))
+    cromosoma_hijo = Cromosoma(genes_mutados, TAMANIO_CADENA)
+    return cromosoma_hijo
 
 def algoritmo_genetico():
-    cromosoma_ideal = Cromosoma('', TAMANIO_CADENA)
+    cromosoma_ideal = None
     lista_poblacion = generar_lista_poblacion()
     lista_cromosomas_aptos = None
     lista_proxima_generacion = None
-    while cromosoma_ideal.es_cromosoma_ideal == False:
-        sleep(3)
-        lista_cromosomas_aptos = devolver_cromosomas_aptos(lista_poblacion, PORCENTAJE_APTOS_NECESARIA_INICIAL)  # 50% aptos
-        lista_poblacion = generar_proxima_generacion(lista_cromosomas_aptos, PORCENTAJE_MAS_APTOS)
-        cromosoma_ideal = filter(lambda x: x.genes == CADENA_OBJETIVO, lista_poblacion)
-        #cromosoma_ideal.val
-    # print(cromosoma_ideal)
+    while cromosoma_ideal == None:
+        lista_cromosomas_aptos = devolver_cromosomas_aptos(lista_poblacion)  # 50% aptos
+        lista_proxima_generacion = generar_proxima_generacion(lista_cromosomas_aptos, lista_poblacion)
+        cromosoma_ideal = next((cromosoma for cromosoma in lista_proxima_generacion if cromosoma.genes == CADENA_OBJETIVO), None)
+        sleep(2)
+    print(cromosoma_ideal.genes)
 
 algoritmo_genetico()
