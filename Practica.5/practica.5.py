@@ -12,24 +12,29 @@ PORCENTAJE_MAS_APTOS = 0.2
 
 class Cromosoma:
     
-    def __init__(self, genes, tamanio):
+    def __init__(self, genes, tamanio, genes_padre_1, genes_padre_2):
         self.genes = genes
         self.tamanio = tamanio
-        self.aptitud = None
+        self.aptitud = 0
         self.identificador = hash(self.genes)
         if (genes == CADENA_OBJETIVO):
             self.es_cromosoma_ideal = True
         else:
             self.es_cromosoma_ideal = False
-        self.determinar_aptitud_eficiente()
+        self.genes_aptos = []
+        # self.determinar_aptitud_eficiente()
+        self.genes_padre_1 = genes_padre_1
+        self.genes_padre_2 = genes_padre_2
+        self.determinar_aptitud()
 
     def determinar_aptitud(self):
         ubicacion_gen = 0
         for gen in self.genes:      
             if (gen == CADENA_OBJETIVO[ubicacion_gen]):
                 self.aptitud = self.aptitud + 1
+                self.genes_aptos.append(ubicacion_gen)
             ubicacion_gen = ubicacion_gen + 1
-        print(f"Cromosoma: {self.genes} ------>  Aptitud: {self.aptitud}")
+        print(f"Cromosoma: {self.genes} ------>  Aptitud: {self.aptitud} --- Genes padres:{self.genes_padre_1, self.genes_padre_2}")
 
     def determinar_aptitud_eficiente(self):
         self.aptitud = textdistance.hamming.normalized_similarity(self.genes, CADENA_OBJETIVO)
@@ -40,7 +45,7 @@ def generar_lista_poblacion():
     poblacion = []
     for i in range(POBALCION):
         cadena = ''.join(random.choice(GENES_POSIBLES) for i in range(TAMANIO_CADENA))
-        new_cromosoma = Cromosoma(cadena, TAMANIO_CADENA)
+        new_cromosoma = Cromosoma(cadena, TAMANIO_CADENA, None, None)
         poblacion.append(new_cromosoma)
     return poblacion
 
@@ -77,8 +82,16 @@ def reproducir_hijos(lista_cromosomas_aptos, rango_lista_hijos):
 
 def mutacion(cromosoma_padre_1, cromosoma_padre_2):
     genes_padres = cromosoma_padre_1.genes + cromosoma_padre_2.genes
-    genes_mutados = ''.join(random.choice(genes_padres) for i in range(TAMANIO_CADENA))
-    cromosoma_hijo = Cromosoma(genes_mutados, TAMANIO_CADENA)
+    genes_mutados = ""
+    # genes_mutados = ''.join(random.choice(genes_padres) for i in range(TAMANIO_CADENA))
+    for ubicacion in range(TAMANIO_CADENA):
+        if (ubicacion in cromosoma_padre_1.genes_aptos):
+            genes_mutados += cromosoma_padre_1.genes[ubicacion]
+        elif (ubicacion in cromosoma_padre_2.genes_aptos):
+            genes_mutados += cromosoma_padre_2.genes[ubicacion]
+        else:
+            genes_mutados +=  random.choice(genes_padres)
+    cromosoma_hijo = Cromosoma(genes_mutados, TAMANIO_CADENA,cromosoma_padre_1.genes, cromosoma_padre_2.genes)
     return cromosoma_hijo
 
 def algoritmo_genetico():
@@ -90,7 +103,10 @@ def algoritmo_genetico():
         lista_cromosomas_aptos = devolver_cromosomas_aptos(lista_poblacion)  # 50% aptos
         lista_proxima_generacion = generar_proxima_generacion(lista_cromosomas_aptos, lista_poblacion)
         cromosoma_ideal = next((cromosoma for cromosoma in lista_proxima_generacion if cromosoma.genes == CADENA_OBJETIVO), None)
-        sleep(2)
+        lista_poblacion.clear()
+        lista_poblacion = lista_proxima_generacion.copy()
+        lista_cromosomas_aptos.clear()
+        lista_proxima_generacion.clear()
     print(cromosoma_ideal.genes)
 
 algoritmo_genetico()
