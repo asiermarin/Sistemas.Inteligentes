@@ -1,5 +1,4 @@
 import random
-from time import sleep
 
 TAMANIO_CADENA = 13
 POBALCION = 100
@@ -75,7 +74,6 @@ def reproducir_hijos(lista_cromosomas_aptos, rango_lista_hijos):
     return lista_hijos
 
 def mutacion(cromosoma_padre_1, cromosoma_padre_2):
-    genes_padres = cromosoma_padre_1.genes + cromosoma_padre_2.genes
     genes_mutados = ""
     for ubicacion in range(TAMANIO_CADENA):
         if (ubicacion in cromosoma_padre_1.genes_aptos):
@@ -83,7 +81,7 @@ def mutacion(cromosoma_padre_1, cromosoma_padre_2):
         elif (ubicacion in cromosoma_padre_2.genes_aptos):
             genes_mutados += cromosoma_padre_2.genes[ubicacion]
         else:
-            genes_mutados +=  random.choice(genes_padres)
+            genes_mutados +=  random.choice(GENES_POSIBLES)
     cromosoma_hijo = Cromosoma(genes_mutados, TAMANIO_CADENA,cromosoma_padre_1.genes, cromosoma_padre_2.genes)
     return cromosoma_hijo
 
