@@ -1,5 +1,4 @@
 import random
-import textdistance
 from time import sleep
 
 TAMANIO_CADENA = 13
@@ -22,7 +21,6 @@ class Cromosoma:
         else:
             self.es_cromosoma_ideal = False
         self.genes_aptos = []
-        # self.determinar_aptitud_eficiente()
         self.genes_padre_1 = genes_padre_1
         self.genes_padre_2 = genes_padre_2
         self.determinar_aptitud()
@@ -35,10 +33,6 @@ class Cromosoma:
                 self.genes_aptos.append(ubicacion_gen)
             ubicacion_gen = ubicacion_gen + 1
         print(f"Cromosoma: {self.genes} ------>  Aptitud: {self.aptitud} --- Genes padres:{self.genes_padre_1, self.genes_padre_2}")
-
-    def determinar_aptitud_eficiente(self):
-        self.aptitud = textdistance.hamming.normalized_similarity(self.genes, CADENA_OBJETIVO)
-        print(f"Cromosoma: {self.genes} ------>  Aptitud: {self.aptitud}")
 
 def generar_lista_poblacion():
     print("Generando lista")
@@ -83,7 +77,6 @@ def reproducir_hijos(lista_cromosomas_aptos, rango_lista_hijos):
 def mutacion(cromosoma_padre_1, cromosoma_padre_2):
     genes_padres = cromosoma_padre_1.genes + cromosoma_padre_2.genes
     genes_mutados = ""
-    # genes_mutados = ''.join(random.choice(genes_padres) for i in range(TAMANIO_CADENA))
     for ubicacion in range(TAMANIO_CADENA):
         if (ubicacion in cromosoma_padre_1.genes_aptos):
             genes_mutados += cromosoma_padre_1.genes[ubicacion]
