@@ -8,23 +8,19 @@ mat = [
     [2, 0, 0, -6, 0],
     [0, -7, -3, 5, -4]
 ]
-rows = len(mat)
-columns = len(mat[0])
 
-print(rows)
-print(columns)
 print(np.matrix(mat))
 
 class Point:
     
-    def __init__(self, x, y):
+    def __init__(self, x, y, mat):
         self.x = x
         self.y = y
-        self.parent = None
+        self.valor = mat[x][y]
         self.cost = math.inf
 
-    def set_parent(self, p):
-        self.parent = p
+    def actualizar_valor(self, valor):
+        self.valor = valor
 
     def set_cost(self, c):
         self.cost = c
@@ -32,10 +28,10 @@ class Point:
     def print(self):
         print(self.x, ',', self.y)
 
-NORTH = Point(0, 1)
-SOUTH = Point(0, -1)
-EAST = Point(1, 0)
-WEST = Point(-1, 0)
+NORTH = Point(0, 1, mat)
+SOUTH = Point(0, -1, mat)
+EAST = Point(1, 0, mat)
+WEST = Point(-1, 0, mat)
 
 class Aplicar_teorema:
 
@@ -48,36 +44,41 @@ class Aplicar_teorema:
     def ejercutar_busqueda_dfs(self):
         pasos = 0
         cola_puntos = deque()
+        positivo1 = Point(2, 0, self._mat)
+        positivo2 = Point(1, 3, self._mat)
+        positivo3 = Point(3, 3, self._mat)
         cola_puntos.append(positivo1)
         cola_puntos.append(positivo2)
         cola_puntos.append(positivo3)
 
         cola_puntos_intento = deque()
-        while cola_puntos:
-            pasos = pasos + 1
+        while pasos < 3:
             cola_puntos_intento = cola_puntos.copy()
-            cola_puntos.clear()
             puntos_alrededores_positivos = []
-            for punto in cola_puntos_intento:    
+            for punto in cola_puntos:    
                 puntos_alrededores_positivos = self.devolver_puntos_alrededores_positivos(punto)
-            for punto_alrededor in puntos_alrededores_positivos:
-                cola_puntos_intento.append(punto_alrededor)
-            cola_puntos.copy(cola_puntos_intento)
+                for punto_alrededor in puntos_alrededores_positivos:
+                    cola_puntos_intento.append(punto_alrededor)
+            cola_puntos.clear()
+            cola_puntos = cola_puntos_intento.copy()
+            cola_puntos_intento.clear()
             pasos = pasos + 1
-            print(pasos)
+            print("Resultado: ")
             print(np.matrix(self._mat))
-            return pasos
+            print(pasos)
 
 
     def devolver_puntos_alrededores_positivos(self, punto_actual):
         posiciones_alrededores = []
         posibles_alrededores = [[NORTH.x, NORTH.y], [SOUTH.x, SOUTH.y], [EAST.x, EAST.y], [WEST.x, WEST.y]]
-        for punto_alrededor in posibles_alrededores:
-            punto_cardinal = Point(punto_actual.x + punto_alrededor[0], punto_actual.y + punto_alrededor[1])
-            if (0 <= punto_cardinal.x < self.anchura_matriz and 0 <= punto_cardinal.y < self.altura_matriz):
-                if (self.obtener_posicion_matriz(punto_cardinal) < 0):
-                    self.sustituir_valor_matriz(punto_cardinal)
-                    posiciones_alrededores.append(punto_cardinal)
+        for punto_alrededor in posibles_alrededores: # Norte el ultimo
+            if (punto_actual.x + punto_alrededor[0] <= 3 and punto_actual.y + punto_alrededor[1] <= 4):
+                punto_cardinal = Point(punto_actual.x + punto_alrededor[0], punto_actual.y + punto_alrededor[1], self._mat)
+                if (0 <= punto_cardinal.x < self.anchura_matriz and 0 <= punto_cardinal.y < self.altura_matriz):
+                    if (self.obtener_posicion_matriz(punto_cardinal) < 0):
+                        nuevo_valor = self.sustituir_valor_matriz(punto_cardinal)
+                        punto_cardinal.actualizar_valor(nuevo_valor)
+                        posiciones_alrededores.append(punto_cardinal)
         return posiciones_alrededores
 
 
@@ -86,11 +87,6 @@ class Aplicar_teorema:
     
     def sustituir_valor_matriz(self, punto_cardinal):
             self._mat[punto_cardinal.x][punto_cardinal.y] = abs(self._mat[punto_cardinal.x][punto_cardinal.y])
+            return self._mat[punto_cardinal.x][punto_cardinal.y]
 
-print(mat[4][3])
-
-positivo1 = Point(0, 2)
-positivo2 = Point(1, 3)
-positivo3 = Point(3, 3)
-
-aplicar_dfs = Aplicar_teorema(5, 4, mat)
+aplicar_dfs = Aplicar_teorema(4, 5, mat)
