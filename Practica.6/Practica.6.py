@@ -65,7 +65,7 @@ He comprobado que con solo tres colores ya funciona.
 """
 problem3 = Problem()
 problem3.addVariables(["GALICIA", "ASTURIAS", "CANTABRIA", "EUSKADI", "NAVARRA", "LA RIOJA", "ARAGON", "CATALONIA",
-"CASTILLA LEON", "MADRID", "CASTILLA MANCHA", "VALENCIA", "BALEARES", "EXTREMADURA", "ANDALUCIA", "MURCIA", "CANARIAS"], ["rojo", "naranja", "verde"])
+"CASTILLA LEON", "MADRID", "CASTILLA MANCHA", "VALENCIA", "BALEARES", "EXTREMADURA", "ANDALUCIA", "MURCIA", "CANARIAS"], ["rojo", "naranja", "verde", "negro", "amarillo", "azul"])
 
 problem3.addConstraint(AllDifferentConstraint(), ["GALICIA", "ASTURIAS", "CASTILLA LEON"]) 
 problem3.addConstraint(AllDifferentConstraint(), ["CANTABRIA", "ASTURIAS", "CASTILLA LEON"]) 
@@ -91,7 +91,7 @@ problem3.addConstraint(AllDifferentConstraint(), ["EXTREMADURA", "CASTILLA MANCH
 
 problem3.addConstraint(AllDifferentConstraint(), ["ANDALUCIA", "CASTILLA MANCHA", "MURCIA"])
 
-solution3 = problem.getSolution()
+solution3 = problem.getSolutions()
 print(solution3)
 
 
