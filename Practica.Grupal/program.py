@@ -65,7 +65,7 @@ class Aplicar_teorema:
             pasos = pasos + 1
             print("Resultado: ")
             print(np.matrix(self._mat))
-            print(pasos)
+            print(f"Pasos: {pasos}")
 
 
     def devolver_puntos_alrededores_positivos(self, punto_actual):
