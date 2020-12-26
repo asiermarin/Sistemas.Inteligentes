@@ -52,7 +52,7 @@ class Aplicar_teorema:
         cola_puntos.append(positivo3)
 
         cola_puntos_intento = deque()
-        while pasos < 3:
+        while pasos < 5:
             cola_puntos_intento = cola_puntos.copy()
             puntos_alrededores_positivos = []
             for punto in cola_puntos:    
@@ -75,12 +75,18 @@ class Aplicar_teorema:
             if (punto_actual.x + punto_alrededor[0] <= 3 and punto_actual.y + punto_alrededor[1] <= 4):
                 punto_cardinal = Point(punto_actual.x + punto_alrededor[0], punto_actual.y + punto_alrededor[1], self._mat)
                 if (0 <= punto_cardinal.x < self.anchura_matriz and 0 <= punto_cardinal.y < self.altura_matriz):
-                    if (self.obtener_posicion_matriz(punto_cardinal) < 0):
+                    if (self.obtener_posicion_matriz(punto_cardinal) < 0 and self.modulo_punto_actual_mayor_que_cardinal(
+                        punto_actual = punto_actual, punto_cardinal = punto_cardinal) == True):
                         nuevo_valor = self.sustituir_valor_matriz(punto_cardinal)
                         punto_cardinal.actualizar_valor(nuevo_valor)
                         posiciones_alrededores.append(punto_cardinal)
         return posiciones_alrededores
 
+    def modulo_punto_actual_mayor_que_cardinal(self, punto_actual, punto_cardinal):
+        if(abs(self.obtener_posicion_matriz(punto_cardinal)) < abs(self.obtener_posicion_matriz(punto_actual))):
+            return True
+        else:
+            return False
 
     def obtener_posicion_matriz(self, current_point):
         return self._mat[current_point.x][current_point.y]
