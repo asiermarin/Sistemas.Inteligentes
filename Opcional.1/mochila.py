@@ -193,7 +193,7 @@ def algoritmo_genetico():
     lista_poblacion = generar_lista_poblacion()
     lista_objetos_aptos = None
     lista_proxima_generacion = None
-    while peso_total > PESO_MAXIMO or pasos < 1200:
+    while peso_total > PESO_MAXIMO or pasos < 20:
         # PESO_MEDIO = PESO_MEDIO - 10000
         # VALOR_MEDIO = VALOR_MEDIO + 50000
         lista_objetos_aptos = devolver_cromosomas_aptos(lista_poblacion)  # 50% aptos
